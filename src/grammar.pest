@@ -1,0 +1,15 @@
+// one or more letters or digits
+name = { ASCII_ALPHANUMERIC+ }
+// some digits with possible minus sign 
+number = { "-"? ~ ASCII_DIGIT+ }
+
+// coordinates for graph, for example: (3,4)
+coordinates = { "(" ~ number ~ "," ~ number ~ ")" }
+
+// new node command 
+// "NEW NODE A1 (2, 3)"
+new_node = { "NEW" ~ " " ~ "NODE"  ~ " " ~ name  ~ " " ~ coordinates }
+
+
+
+
