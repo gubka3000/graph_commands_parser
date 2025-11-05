@@ -35,7 +35,7 @@ In the final, the parser should distinguish basic graph commands such as:
 - deleting objects
 - analyzing the constructed graph
 
-* By objects we mean vertices and edges
+(*By objects we mean vertices and edges*)
 
 This parser will help you build a basic graph using commands. It will also help you work with the graph, modify it, and even visualize it.
 
