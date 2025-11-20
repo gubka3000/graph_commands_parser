@@ -1,14 +1,51 @@
-// one or more letters or digits
-name = { ASCII_ALPHANUMERIC+ }
+// BASIC RULES
+
+// letter or letter + letter or letter + digit
+name = { ASCII_ALPHA ~ ASCII_ALPHANUMERIC? }
 // some digits with possible minus sign 
-number = { "-"? ~ ASCII_DIGIT+ }
+// could be round or float 
+// for ex: -0.4; 543; 
+number = { "-"? ~ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 
 // coordinates for graph, for example: (3,4)
 coordinates = { "(" ~ number ~ "," ~ number ~ ")" }
 
+// MAIN COMMANDS
+
 // new node command 
 // "NEW NODE A1 (2, 3)"
-new_node = { "NEW" ~ " " ~ "NODE"  ~ " " ~ name  ~ " " ~ coordinates }
+node_name_coord = { name ~ " " ~ coordinates } 
+new_node = { "NEW" ~ " " ~ "NODE"  ~ " " ~ node_name_coord ~ (" " ~ node_name_coord)* }
+
+// new edge command 
+// "NEW EDGE A1-B2"
+edge_name = { name ~ "-" ~ name }
+new_edge = { "NEW" ~ " " ~ "EDGE"  ~ " " ~ edge_name ~ (" " ~ edge_name)* }
+
+// delete node command 
+// "DELETE NODE A1"
+delete_node = { "DELETE" ~ " " ~ "NODE"  ~ " " ~ name ~ (" " ~ name)*}
+
+// delete edge command 
+// "DELETE EDGE A1-B2"
+delete_edge = { "DELETE" ~ " " ~ "EDGE"  ~ " " ~ edge_name ~ (" " ~ edge_name)* }
+
+// create graph path (at least 3 nodes should be connected)
+// "CONNECT PATH A1 -> B2 -> K4 -> L1"
+new_path = { "CONNECT" ~ " " ~ "PATH" ~ " " ~ name ~ (" -> " ~ name){2,}}
+
+// FILE RULES
+
+commands = { new_node | new_edge | delete_node | delete_edge | new_path }
+
+// file rule
+// One or multiple commands could be parsed
+// commands could be separeted with multiple new lines 
+NEWLINE = _{ "\n" | "\r\n" }
+
+file = { SOI ~ (commands ~ NEWLINE*)+ ~ EOI }
+
+
 
 
 

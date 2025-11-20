@@ -2,10 +2,11 @@
 name = "graph_commands_parser"
 version = "0.1.0"
 edition = "2024"
-description = "Custom parser for processing basic graph commands. It is possible to process simple commands such as creating vertices and edges, working with coordinates, graph analysis, and more"
+description = "Custom parser for processing basic graph commands. It is possible to process simple commands such as creating vertices and edges, working with coordinates, connecting paths, and more"
 license = "MIT"
 
 [dependencies]
 anyhow = "1.0.100"
+clap = { version = "4.5.52", features = ["derive"] }
 pest = "2.8.3"
 pest_derive = "2.8.3"

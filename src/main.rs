@@ -1,57 +1,64 @@
+use clap::{Parser as ClapParser, Subcommand};
+use std::fs;
+use graph_commands_parser::*;
+
 use pest::Parser;
-use pest_derive::Parser;
-use anyhow::anyhow;
 
-
-#[derive(Parser)]
-#[grammar = "./grammar.pest"]
-pub struct Command;
-
-fn main() -> anyhow::Result< () > {
-    Ok(())
+// to make command-line info into struct
+#[derive(ClapParser)]
+#[command(name = "graph-parser", bin_name = "graph-parser", about = "Graph commands parser")]
+struct Args {
+    #[command(subcommand)]
+    cmd: Commands
 }
 
-// UNIT TESTS
+// List of possible commands
+// "-- help" command includes by default
+#[derive(Subcommand)]
+enum Commands {
+    Credits,
+    Read {
+        file: String,
+    },
+}
 
-#[cfg(test)]
-mod tests {
+// cargo run -- credits 
+// cargo run -- help 
+// cargo run -- read input_pass_test.txt
+// cargo run -- read input_fail_test.txt
 
-    use super::*;
+fn main() {
+    let cli = Args::parse();
 
-    // test coordinates rule
-    #[test]
-    fn test_coordinates() -> anyhow::Result< () > {
+    match cli.cmd {
 
-        let res = Command::parse(Rule::coordinates, "(3,4)")?.next().ok_or_else( || anyhow!( "Failed to parse coordinates" ) )?;
-        assert_eq!( res.as_str(), "(3,4)" );
-        assert_eq!( res.as_span().start(), 0 );
-        assert_eq!( res.as_span().end(), 5 );
+        Commands::Credits => {
+            println!("This parser was written by Illia3000");
+            println!("on Rust NAUKMA course, for the purpose of learning");
+            println!("Date: 20-11-2025")
+        }
 
-        assert!(Command::parse(Rule::coordinates, "5g").is_err());
-        assert!(Command::parse(Rule::coordinates, "").is_err());
-        assert!(Command::parse(Rule::coordinates, "(2, 5)").is_err());
-        assert!(Command::parse(Rule::coordinates, "(,4)").is_err());
+        Commands::Read { file } => {
 
-        Ok(())
-    }
+            match fs::read_to_string(&file) {
 
-    // test "new node" rule
-    #[test]
-    fn test_new_node() -> anyhow::Result< () > {
+                Ok(content) => {
+                    match Command::parse(Rule::file, &content) {
+                        Ok(content) => {
+                            println!("File was parsed: {}", content);
+                        }
+                        Err(e) => {
+                            println!("{:#?}", e); 
+                        }
+                    }
+                }
+                Err(e) => {
+                    println!("Cannot read file: {}", e);
+                }
+            }
+ 
+        }
 
-        let res = Command::parse(Rule::new_node, "NEW NODE B1 (3,4)")?.next().ok_or_else( || anyhow!( "Failed to parse new node command" ) )?;
-        assert_eq!( res.as_str(), "NEW NODE B1 (3,4)" );
-        assert_eq!( res.as_span().start(), 0 );
-        assert_eq!( res.as_span().end(), 17 );
-
-        assert!(Command::parse(Rule::new_node, "CREATE NODE B1 (3,4)").is_err());
-        assert!(Command::parse(Rule::new_node, "NEW node B1 (3,4)").is_err());
-        assert!(Command::parse(Rule::new_node, "new node B1 (3,4)").is_err());
-        assert!(Command::parse(Rule::new_node, "NEW  NODE B1 (3,4)").is_err());
-        assert!(Command::parse(Rule::new_node, "NEW NODE B1 (3,)").is_err());
-        assert!(Command::parse(Rule::new_node, "NEW NODE (3,4)").is_err());
-
-        Ok(())
     }
 }
 
